@@ -1,0 +1,372 @@
+
+
+1) Visión general y decisiones (rápidas)
+
+Backend: FastAPI (APIs REST/GraphQL, async). Ideal si quieres microservicios o servir a apps móviles además de la web. 
+fastapi.tiangolo.com
+
+ORM/DB: PostgreSQL + SQLAlchemy / SQLModel / Alembic (migraciones). PostgreSQL sigue siendo la opción recomendada para ecommerce. 
+Yugabyte
+
+Autenticación: JWT para API + cookies seguras (o session cookies si monolito Django).
+
+Pagos: Stripe (docs y SDKs Python). 
+Documentación de Stripe
++1
+
+Frontend: React + Vite + Tailwind CSS (+ Framer Motion para animaciones). Rápido de desarrollar, excelente DX y diseño animado. 
+Medium
+
+Contenedores / Infra: Docker / docker-compose para local; desplegar en VPS/cloud (Railway / Render / Fly / DigitalOcean / Vercel for frontend).
+
+Almacenamiento de assets: S3 compatible (AWS S3, DigitalOcean Spaces, or Supabase Storage).
+
+Background jobs: Redis + Celery o RQ (envíos de emails, generación de informes, sincronizaciones).
+
+2) Estructura de proyecto propuesta (esqueleto)
+ecommerce-project/
+├─ backend/
+│  ├─ app/
+│  │  ├─ main.py
+│  │  ├─ api/
+│  │  │  ├─ v1/
+│  │  │  │  ├─ auth.py
+│  │  │  │  ├─ products.py
+│  │  │  │  ├─ users.py
+│  │  ├─ core/
+│  │  │  ├─ config.py
+│  │  ├─ models/
+│  │  │  ├─ user.py
+│  │  │  ├─ product.py
+│  │  ├─ db/
+│  │  │  ├─ session.py
+│  │  │  ├─ init_db.py
+│  │  ├─ schemas/
+│  │  ├─ services/
+│  │  ├─ tasks/
+│  │  └─ static/ (images uploads during dev)
+│  ├─ Dockerfile
+│  └─ requirements.txt
+├─ frontend/
+│  ├─ package.json
+│  ├─ src/
+│  │  ├─ main.tsx
+│  │  ├─ App.tsx
+│  │  ├─ pages/
+│  │  │  ├─ Home.tsx
+│  │  │  ├─ Catalog.tsx
+│  │  │  ├─ ProductPage.tsx
+│  │  │  ├─ Account/
+│  │  ├─ components/
+│  │  │  ├─ ProductCard.tsx
+│  │  │  ├─ NavBar.tsx
+│  ├─ tailwind.config.js
+│  └─ vite.config.ts
+├─ scripts/
+│  └─ gen_placeholders.py
+├─ docker-compose.yml
+└─ README.md
+
+3) Dependencias recomendadas (rápidas)
+
+Backend (requirements.txt):
+
+fastapi
+uvicorn[standard]
+sqlmodel           # opcional, API similar a pydantic+sqlalchemy
+sqlalchemy
+alembic
+psycopg2-binary
+python-jose[cryptography]  # JWT
+passlib[bcrypt]           # hashing passwords
+python-dotenv
+stripe
+aiofiles                  # servir archivos estáticos
+Pillow                    # (para el script de placeholders)
+Faker                     # (datos ficticios)
+redis
+celery                    # o rq si prefieres
+
+
+Frontend (package.json deps):
+
+react, react-dom, react-router-dom
+vite
+typescript (opcional pero recomendado)
+tailwindcss
+postcss, autoprefixer
+framer-motion
+axios (o swr/react-query)
+@stripe/stripe-js
+
+4) docker-compose.yml (esqueleto)
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    command: yarn dev --host
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+
+volumes:
+  db_data:
+
+5) Script en Python para generar placeholders (imágenes y JSON)
+
+Guarda en scripts/gen_placeholders.py. Crea varias imágenes simples (Pillow) y un products.json con datos de ejemplo.
+
+# scripts/gen_placeholders.py
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+from faker import Faker
+import json
+import random
+
+OUT_DIR = Path("backend/app/static/placeholders")
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+fake = Faker("es_ES")
+
+def make_img(name, size=(800,800), bg=(240,240,245)):
+    img = Image.new("RGB", size, color=bg)
+    d = ImageDraw.Draw(img)
+    text = name
+    # try default font
+    try:
+        font = ImageFont.truetype("arial.ttf", 40)
+    except Exception:
+        font = ImageFont.load_default()
+    w,h = d.textsize(text, font=font)
+    d.text(((size[0]-w)/2,(size[1]-h)/2), text, fill=(40,40,40), font=font)
+    filename = OUT_DIR / f"{name.replace(' ','_')}.png"
+    img.save(filename)
+    return str(filename)
+
+def gen_products(n=12):
+    products = []
+    for i in range(n):
+        title = fake.sentence(nb_words=3).rstrip(".")
+        price = round(random.uniform(5,250),2)
+        img = make_img(f"{title}", size=(800,800))
+        prod = {
+            "id": i+1,
+            "title": title,
+            "description": fake.paragraph(nb_sentences=2),
+            "price": price,
+            "currency": "EUR",
+            "image": img,
+            "slug": title.lower().replace(" ", "-")
+        }
+        products.append(prod)
+    with open("backend/app/static/placeholders/products.json", "w", encoding="utf-8") as f:
+        json.dump(products, f, ensure_ascii=False, indent=2)
+    print(f"Generated {n} products and images in {OUT_DIR}")
+
+if __name__ == "__main__":
+    gen_products(20)
+
+
+Este script crea imágenes sencillas (puedes cambiar el diseño para vectoriales si prefieres SVGs generados de forma programática) y un products.json con muestras.
+
+6) Backend: ejemplo mínimo FastAPI (archivos clave)
+
+backend/app/main.py
+
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from app.api.v1 import products, auth, users
+
+app = FastAPI(title="MiEcommerce API")
+
+app.include_router(products.router, prefix="/api/v1/products", tags=["products"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+
+# servir assets en dev
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+backend/app/api/v1/products.py (simplified)
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import List
+import json
+from pathlib import Path
+
+router = APIRouter()
+
+class Product(BaseModel):
+    id: int
+    title: str
+    description: str
+    price: float
+    currency: str
+    image: str
+    slug: str
+
+DATA_FILE = Path("static/placeholders/products.json")
+
+@router.get("/", response_model=List[Product])
+def list_products():
+    with DATA_FILE.open("r", encoding="utf-8") as f:
+        products = json.load(f)
+    return products
+
+@router.get("/{slug}", response_model=Product)
+def get_product(slug: str):
+    with DATA_FILE.open("r", encoding="utf-8") as f:
+        products = json.load(f)
+    for p in products:
+        if p["slug"] == slug:
+            return p
+    raise HTTPException(status_code=404, detail="Not found")
+
+
+(Este esqueleto te permite arrancar rápido con placeholders y después sustituir por DB/ORM.)
+
+7) Frontend: estructura y ejemplo de componente (React + Vite + Tailwind)
+
+frontend/src/components/ProductCard.tsx (TypeScript)
+
+import React from "react";
+
+type Props = {
+  product: any;
+};
+
+export default function ProductCard({ product }: Props) {
+  return (
+    <article className="bg-white rounded-2xl shadow-md p-4 hover:shadow-xl transition-shadow">
+      <img src={product.image} alt={product.title} className="w-full h-48 object-cover rounded-lg" />
+      <h3 className="mt-3 text-lg font-semibold">{product.title}</h3>
+      <p className="text-sm text-slate-600">{product.description}</p>
+      <div className="mt-4 flex items-center justify-between">
+        <strong>{product.price} €</strong>
+        <button className="px-3 py-1 rounded-lg border">Añadir</button>
+      </div>
+    </article>
+  );
+}
+
+
+frontend/src/pages/Home.tsx — consume GET /api/v1/products/ (usa axios).
+
+Tailwind + Framer Motion para animaciones suaves (hover, entrada en lista).
+
+8) Integración de pagos (Stripe)
+
+Usa Stripe Checkout o Payment Intents según casos. En el backend crearás un endpoint que genere PaymentIntent (o Checkout Session) con la librería oficial de Stripe en Python. Testea siempre en modo test. 
+Documentación de Stripe
+
+
+Ejemplo (simplificado):
+
+import stripe
+stripe.api_key = "sk_test_..."
+
+from fastapi import APIRouter
+router = APIRouter()
+
+@router.post("/create-checkout-session")
+def create_checkout(session_items: list):
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        mode="payment",
+        line_items=[{"price_data": {...}, "quantity": 1} for item in session_items],
+        success_url="https://tusitio.com/success",
+        cancel_url="https://tusitio.com/cancel",
+    )
+    return {"url": session.url}
+
+9) Scripts / comandos de arranque básicos
+
+Backend (dev): uvicorn app.main:app --reload --port 8000
+
+Frontend (dev): yarn dev o npm run dev (Vite)
+
+Generar placeholders: python scripts/gen_placeholders.py
+
+Docker: docker-compose up --build
+
+10) Diseño UI / animación — ideas rápidas
+
+Estética: base neutra (blancos/cremas), acento color vivo para CTAs. Tipografía grande para títulos (serif sutil para hero si quieres toque "bellas artes").
+
+Animaciones: micro-interacciones usando Framer Motion (cards que elevan y rotan ligeramente al hover, transiciones en la navegación).
+
+Gráficos atractivos: usa SVGs vectoriales para íconos y hero illustrations (puedes generar variantes en Inkscape / Figma o programáticamente con SVG).
+
+Sistema de diseño: tokens CSS (Tailwind facilita).
+
+11) Siguientes pasos (prioritarios)
+
+Decide FastAPI (mi recomendación) o Django (si prefieres admin integrado). 
+fastapi.tiangolo.com
++1
+
+Inicializar repo + Docker + placeholders (ejecutar gen_placeholders.py).
+
+Implementar auth básica (registro, login, JWT + refresh).
+
+Conectar DB y añadir modelos reales; pasar endpoints a DB.
+
+Preparar integración Stripe en modo test. 
+Documentación de Stripe
+
+Diseñar UI con Tailwind y crear 8–10 componentes reutilizables (Nav, ProductCard, Cart, Modal, FormInput, Avatar).
+
+12) Entrega inmediata: carpeta zip / código listo
+
+Si quieres, ahora mismo te puedo:
+
+Generar los ficheros base (README, docker-compose, gen_placeholders.py, backend/app/main.py, ejemplos) listos para pegar en tu repo.
+
+O montar un repositorio inicial en tu máquina (si me das permisos locales — no puedo ejecutar en tu máquina, pero te doy todo el contenido listo para copiar).
+
+Dime si prefieres que:
+
+Te entregue los ficheros completos en el chat (los pego aquí para copiar), o
+
+Te entregue un archivo .tar o .zip descargable (puedo generar el contenido aquí y darte instrucciones para crear el zip), o
+
+Empiece por la UI (primera versión del frontend con Tailwind y animaciones) — si quieres que priorice la estética/ilustración.
+
+Referencias (para justificar las elecciones)
+
+FastAPI — documentación oficial (ideal para APIs asíncronas y tipado). 
+fastapi.tiangolo.com
+
+Comparativa Django vs FastAPI (ventajas según caso). 
+The JetBrains Blog
+
+Stack frontend actual (React + Vite + Tailwind como recomendación 2025). 
+Medium
+
+PostgreSQL: por qué sigue siendo recomendado para proyectos productivos en 2025. 
+Yugabyte
+
+Stripe docs (integración con Python y buenas prácticas). 
+Documentación de Stripe

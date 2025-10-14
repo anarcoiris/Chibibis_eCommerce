@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "title": "Producto de ejemplo",
+    "description": "Descripción del producto de ejemplo.",
+    "price": 19.99,
+    "currency": "EUR",
+    "image": "/static/placeholders/sample.png",
+    "slug": "producto-de-ejemplo"
+  }
+]
