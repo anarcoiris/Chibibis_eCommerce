@@ -424,11 +424,6 @@ docker-compose up --build
 
 ---
 
-## 12) Entrega inmediata
-
-Puedo generar los ficheros base (README, docker-compose, `gen_placeholders.py`, `backend/app/main.py`, ejemplos) listos para pegar en tu repo, o entregarte un `.zip`/`.tar` descargable. Dime cuál prefieres.
-
----
 
 ## Referencias
 
