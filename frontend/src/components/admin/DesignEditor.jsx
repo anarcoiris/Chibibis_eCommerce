@@ -28,7 +28,8 @@ export default function DesignEditor() {
           colors: design.colors,
           typography: design.typography,
           layout: design.layout,
-          components: design.components
+          components: design.components,
+          is_active: true
         });
       }
       alert("Design saved successfully!");
@@ -52,17 +53,24 @@ export default function DesignEditor() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">Visual Design Editor</h2>
+        <h2 className="text-xl font-bold" style={{ color: theme.colors.text }}>Visual Design Editor</h2>
         <div className="flex gap-2">
           <button
             onClick={() => setPreview(!preview)}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            className="px-4 py-2 rounded-lg transition-colors"
+            style={{
+              backgroundColor: `${theme.colors.primary}20`,
+              color: theme.colors.text
+            }}
           >
             {preview ? "Hide" : "Show"} Preview
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 text-white rounded-lg transition-colors"
+            style={{
+              backgroundImage: `linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.secondary})`
+            }}
           >
             Save Design
           </button>
@@ -74,11 +82,11 @@ export default function DesignEditor() {
         <div className="space-y-6">
           {/* Colors Section */}
           <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <h3 className="font-semibold text-lg mb-4">Colors</h3>
+            <h3 className="font-semibold text-lg mb-4" style={{ color: theme.colors.text }}>Colors</h3>
             <div className="space-y-3">
               {Object.entries(design.colors).map(([key, value]) => (
                 <div key={key} className="flex items-center gap-3">
-                  <label className="w-32 text-sm font-medium text-gray-700 capitalize">
+                  <label className="w-32 text-sm font-medium capitalize" style={{ color: theme.colors.text }}>
                     {key.replace("_", " ")}
                   </label>
                   <input
@@ -100,10 +108,10 @@ export default function DesignEditor() {
 
           {/* Typography Section */}
           <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <h3 className="font-semibold text-lg mb-4">Typography</h3>
+            <h3 className="font-semibold text-lg mb-4" style={{ color: theme.colors.text }}>Typography</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.colors.text }}>
                   Heading Font
                 </label>
                 <select
@@ -127,7 +135,7 @@ export default function DesignEditor() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.colors.text }}>
                   Body Font
                 </label>
                 <select
@@ -154,10 +162,10 @@ export default function DesignEditor() {
 
           {/* Layout Section */}
           <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <h3 className="font-semibold text-lg mb-4">Layout</h3>
+            <h3 className="font-semibold text-lg mb-4" style={{ color: theme.colors.text }}>Layout</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.colors.text }}>
                   Border Radius
                 </label>
                 <select
@@ -181,7 +189,7 @@ export default function DesignEditor() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.colors.text }}>
                   Spacing
                 </label>
                 <select
@@ -208,7 +216,7 @@ export default function DesignEditor() {
         {/* Preview Panel */}
         {preview && (
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 className="font-semibold text-lg mb-4">Live Preview</h3>
+            <h3 className="font-semibold text-lg mb-4" style={{ color: theme.colors.text }}>Live Preview</h3>
 
             <div className="space-y-4" style={{
               backgroundColor: design.colors.background,

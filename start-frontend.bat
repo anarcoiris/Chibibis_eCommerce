@@ -19,6 +19,6 @@ REM Start frontend server
 cd frontend
 echo Frontend running on http://localhost:5173
 echo.
-npm run dev
+npm run dev --host
 
 pause

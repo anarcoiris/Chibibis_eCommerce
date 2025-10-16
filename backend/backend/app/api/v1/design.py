@@ -15,6 +15,7 @@ class DesignCreate(BaseModel):
     typography: dict = {}
     layout: dict = {}
     components: dict = {}
+    is_active: bool = False
 
 
 class DesignUpdate(BaseModel):
@@ -61,6 +62,12 @@ def get_active_design(session: Session = Depends(get_session)):
 @router.post("/", response_model=dict, status_code=201)
 def create_design(design: DesignCreate, session: Session = Depends(get_session)):
     """Create a new design configuration."""
+    # If setting this design as active, deactivate all others
+    if design.is_active:
+        for other_design in session.exec(select(SiteDesign)).all():
+            other_design.is_active = False
+            session.add(other_design)
+
     db_design = SiteDesign(**design.model_dump())
     session.add(db_design)
     session.commit()
@@ -84,8 +91,9 @@ def update_design(
     # If setting this design as active, deactivate all others
     if update_data.get("is_active") == True:
         for other_design in session.exec(select(SiteDesign)).all():
-            other_design.is_active = False
-            session.add(other_design)
+            if other_design.id != design_id:  # Don't deactivate the current design
+                other_design.is_active = False
+                session.add(other_design)
 
     for key, value in update_data.items():
         setattr(db_design, key, value)

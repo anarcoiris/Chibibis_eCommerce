@@ -1,75 +1,68 @@
 # Ecommerce Starter Project
 
-A full-stack ecommerce application built with **FastAPI** (backend) and **React + Vite + Tailwind CSS** (frontend).
+A modern full-stack ecommerce application built with **FastAPI** (backend) and **React + Vite + Tailwind CSS** (frontend).
 
-## Features
+## ✨ Features
 
-**Backend (FastAPI):**
+### Backend (FastAPI)
 - ✅ RESTful API with automatic OpenAPI documentation
 - ✅ SQLModel ORM with SQLite (PostgreSQL-ready)
-- ✅ Alembic database migrations
-- ✅ Pydantic schemas for validation
-- ✅ CRUD operations for products
-- ✅ Environment-based configuration
-- ✅ CORS configuration for frontend integration
+- ✅ Database migrations with Alembic
+- ✅ CRUD operations for products, posts, and design
+- ✅ Dynamic theme system with live customization
+- ✅ Content management system
 
-**Frontend (React + Vite):**
-- ✅ React 18 with modern hooks
-- ✅ React Router for navigation
-- ✅ Tailwind CSS for styling
-- ✅ Reusable components (ProductCard, NavBar)
-- ✅ Axios for API requests
-- ✅ Vite dev server with HMR
-- ✅ API proxy configuration
+### Frontend (React + Vite)
+- ✅ Modern React 18 with hooks
+- ✅ **Animated particle background** with mouse interaction
+- ✅ **Dynamic theme system** - customize colors and fonts in real-time
+- ✅ **Shopping cart** with localStorage persistence
+- ✅ **Admin panel** for content and design management
+- ✅ Responsive design with Tailwind CSS 4
+- ✅ Glass morphism UI effects
 
-## Quick Start
+## 🚀 Quick Start
 
-### Windows
+### First Time Setup
 
-**Option 1: Use the startup scripts**
+**Windows:**
 ```bash
-# Terminal 1 - Backend
-start-backend.bat
+# Run automated setup
+setup.bat
 
-# Terminal 2 - Frontend
+# Or use the interactive launcher
+launcher.bat
+```
+
+**Linux/macOS:**
+```bash
+# Make setup script executable and run
+chmod +x setup.sh
+./setup.sh
+```
+
+### Running the Application
+
+**Windows:**
+```bash
+# Option 1: Start all servers at once
+start-all.bat
+
+# Option 2: Use interactive launcher
+launcher.bat
+
+# Option 3: Start individually
+start-backend.bat
 start-frontend.bat
 ```
 
-**Option 2: Manual start**
-```bash
-# Backend
-.venv\Scripts\activate
-cd backend
-python -m uvicorn backend.app.main:app --reload --port 8000
-
-# Frontend (new terminal)
-cd frontend
-npm run dev
-```
-
-### Linux/macOS
-
-**Option 1: Use the startup scripts**
+**Linux/macOS:**
 ```bash
 # Terminal 1 - Backend
-chmod +x start-backend.sh
 ./start-backend.sh
 
 # Terminal 2 - Frontend
-chmod +x start-frontend.sh
 ./start-frontend.sh
-```
-
-**Option 2: Manual start**
-```bash
-# Backend
-source .venv/bin/activate
-cd backend
-python -m uvicorn backend.app.main:app --reload --port 8000
-
-# Frontend (new terminal)
-cd frontend
-npm run dev
 ```
 
 ### Access Points
@@ -78,86 +71,81 @@ npm run dev
 - **Admin Panel**: http://localhost:5173/admin
 - **Backend API**: http://localhost:8000
 - **API Docs (Swagger)**: http://localhost:8000/docs
-- **API Docs (ReDoc)**: http://localhost:8000/redoc
+- **ReDoc**: http://localhost:8000/redoc
 
-## Project Structure
+## 📚 Documentation
+
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Complete documentation index
+- **[SETUP.md](SETUP.md)** - Detailed setup guide
+- **[ADMIN_PANEL.md](ADMIN_PANEL.md)** - Admin panel user guide
+- **[DESIGN_GUIDE.md](DESIGN_GUIDE.md)** - UI/UX design system
+- **[COMPATIBILITY.md](COMPATIBILITY.md)** - Version compatibility
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history
+
+## 🛠️ Technology Stack
+
+**Backend:**
+- FastAPI 0.119
+- SQLModel + SQLAlchemy 2.0
+- Alembic (migrations)
+- Python 3.10-3.13 ⚠️ (3.14+ not fully tested)
+
+**Frontend:**
+- React 18.2
+- Vite 5.0
+- Tailwind CSS 4.0
+- React Router DOM 6.11
+- Axios 1.4
+
+## 📦 Project Structure
 
 ```
 ecommerce/
-├─ backend/
-│  ├─ backend/app/           # FastAPI application
-│  │  ├─ main.py            # App entry point
-│  │  ├─ models/            # SQLModel database models
-│  │  ├─ schemas/           # Pydantic schemas
-│  │  ├─ api/v1/            # API endpoints
-│  │  ├─ db/                # Database config & seed
-│  │  └─ core/              # Settings & config
-│  ├─ alembic/              # Database migrations
-│  └─ ecommerce.db          # SQLite database
-├─ frontend/
+├─ backend/                 # FastAPI backend
+│  ├─ backend/app/         # Application code
+│  │  ├─ models/           # Database models
+│  │  ├─ schemas/          # Pydantic schemas
+│  │  ├─ api/v1/           # API endpoints
+│  │  ├─ db/               # Database config
+│  │  └─ core/             # Settings
+│  ├─ alembic/             # Migrations
+│  └─ requirements.txt     # Python dependencies
+├─ frontend/               # React frontend
 │  ├─ src/
-│  │  ├─ App.jsx            # Root component
-│  │  ├─ pages/             # Page components
-│  │  └─ components/        # Reusable components
-│  └─ vite.config.js        # Vite configuration
-├─ scripts/
-│  └─ gen_placeholders.py   # Generate sample data
-├─ start-backend.bat        # Windows backend script
-├─ start-frontend.bat       # Windows frontend script
-├─ start-backend.sh         # Linux/macOS backend script
-├─ start-frontend.sh        # Linux/macOS frontend script
-├─ SETUP.md                 # Detailed setup guide
-└─ README.md                # This file
+│  │  ├─ components/       # UI components
+│  │  ├─ context/          # React contexts
+│  │  └─ pages/            # Page components
+│  └─ package.json         # Node dependencies
+├─ scripts/                # Utility scripts
+├─ docs/                   # Additional documentation
+├─ setup.bat / setup.sh    # Automated setup
+├─ launcher.bat            # Interactive menu (Windows)
+└─ start-all.bat           # Start all servers
 ```
 
-## Documentation
-
-- **[SETUP.md](SETUP.md)** - Complete setup and development guide
-- **[ADMIN_PANEL.md](ADMIN_PANEL.md)** - Admin panel user guide and API reference
-- **[plan_ecommerce.txt](plan_ecommerce.txt)** - Technical architecture and planning notes
-- **[CLAUDE.md](CLAUDE.md)** - Project instructions for Claude Code
-
-## Technology Stack
-
-**Backend:**
-- FastAPI 0.119+
-- SQLModel (SQLAlchemy + Pydantic)
-- Alembic (migrations)
-- Uvicorn (ASGI server)
-- Python 3.10+
-
-**Frontend:**
-- React 18
-- Vite 5
-- Tailwind CSS 4
-- React Router DOM 6
-- Axios
-- Node.js 18+
-
-## Current Status
+## 🎨 Current Features
 
 **Implemented:**
-- Database models (User, Product, Post, SiteDesign)
-- Product CRUD API endpoints
-- **Admin Panel** with content management
-- **Visual Design Editor** for live customization
-- Post/content creation and editing
-- Frontend routing and navigation
-- Product listing page
-- Component-based UI
-- Database migrations
-- Seed data script
-- CORS configuration
+- ✅ **Dynamic Theme System** - Customize colors, fonts, and layout
+- ✅ **Shopping Cart** - Add/remove products, localStorage persistence
+- ✅ **Admin Panel** - Content management and visual design editor
+- ✅ **Animated Background** - Particle network with mouse interaction
+- ✅ Database models (User, Product, Post, SiteDesign)
+- ✅ Product CRUD API
+- ✅ Post/content management
+- ✅ Responsive glass morphism UI
+- ✅ Hot module replacement (HMR)
 
 **Next Steps:**
 1. Authentication (JWT)
-2. Rich text WYSIWYG editor
-3. Media/image upload functionality
-4. Shopping cart functionality
-5. Stripe payment integration
-6. User profile pages
+2. Product detail pages
+3. Checkout flow
+4. Stripe payment integration
+5. Order management
+6. Image upload
 
-## License
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details
 

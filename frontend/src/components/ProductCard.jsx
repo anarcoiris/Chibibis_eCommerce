@@ -33,14 +33,14 @@ export default function ProductCard({ product }) {
       {/* Content */}
       <div className="p-4 sm:p-5">
         <h3
-          className="text-lg sm:text-xl font-bold text-gray-800 mb-2 line-clamp-2 transition-colors"
-          style={{ '--hover-color': theme.colors.primary }}
+          className="text-lg sm:text-xl font-bold mb-2 line-clamp-2 transition-colors"
+          style={{ color: theme.colors.text }}
           onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
-          onMouseLeave={(e) => e.currentTarget.style.color = ''}
+          onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.text}
         >
           {product.title}
         </h3>
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+        <p className="text-sm mb-4 line-clamp-2" style={{ color: theme.colors.text, opacity: 0.7 }}>
           {product.description}
         </p>
 

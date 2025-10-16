@@ -1,19 +1,24 @@
 import React, { useState } from "react";
 import PostManager from "../components/admin/PostManager";
 import DesignEditor from "../components/admin/DesignEditor";
+import { useTheme } from "../context/ThemeContext";
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("posts");
+  const { theme } = useTheme();
 
   return (
     <div className="min-h-screen pb-12">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg mb-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
+              style={{
+                backgroundImage: `linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.secondary})`
+              }}>
             Admin Panel
           </h1>
-          <p className="text-gray-600 mt-2 text-sm sm:text-base">Gestiona tu contenido y diseño</p>
+          <p className="mt-2 text-sm sm:text-base" style={{ color: theme.colors.text, opacity: 0.7 }}>Gestiona tu contenido y diseño</p>
         </div>
       </div>
 
@@ -24,21 +29,25 @@ export default function AdminPanel() {
             <nav className="flex flex-wrap -mb-px">
               <button
                 onClick={() => setActiveTab("posts")}
-                className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base border-b-2 transition-all ${
-                  activeTab === "posts"
-                    ? "border-purple-500 text-purple-600 bg-purple-50/50"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className="px-4 sm:px-6 py-3 font-medium text-sm sm:text-base border-b-2 transition-all"
+                style={{
+                  borderColor: activeTab === "posts" ? theme.colors.primary : "transparent",
+                  color: activeTab === "posts" ? theme.colors.primary : theme.colors.text,
+                  backgroundColor: activeTab === "posts" ? `${theme.colors.primary}10` : "transparent",
+                  opacity: activeTab === "posts" ? 1 : 0.7
+                }}
               >
                 Posts & Content
               </button>
               <button
                 onClick={() => setActiveTab("design")}
-                className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-base border-b-2 transition-all ${
-                  activeTab === "design"
-                    ? "border-purple-500 text-purple-600 bg-purple-50/50"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className="px-4 sm:px-6 py-3 font-medium text-sm sm:text-base border-b-2 transition-all"
+                style={{
+                  borderColor: activeTab === "design" ? theme.colors.primary : "transparent",
+                  color: activeTab === "design" ? theme.colors.primary : theme.colors.text,
+                  backgroundColor: activeTab === "design" ? `${theme.colors.primary}10` : "transparent",
+                  opacity: activeTab === "design" ? 1 : 0.7
+                }}
               >
                 Visual Design
               </button>

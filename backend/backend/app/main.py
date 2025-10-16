@@ -10,7 +10,12 @@ app = FastAPI(title="MiEcommerce API - Admin Panel")
 # CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://192.168.1.133:5173",
+        "http://192.168.1.133:8000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

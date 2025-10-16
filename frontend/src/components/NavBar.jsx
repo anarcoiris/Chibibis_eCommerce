@@ -31,17 +31,19 @@ export default function NavBar() {
           <div className="hidden md:flex items-center gap-6">
             <Link
               to="/"
-              className="text-gray-700 transition-colors font-medium"
+              className="transition-colors font-medium"
+              style={{ color: theme.colors.text }}
               onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
-              onMouseLeave={(e) => e.currentTarget.style.color = ''}
+              onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.text}
             >
               Inicio
             </Link>
             <Link
               to="/catalog"
-              className="text-gray-700 transition-colors font-medium"
+              className="transition-colors font-medium"
+              style={{ color: theme.colors.text }}
               onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
-              onMouseLeave={(e) => e.currentTarget.style.color = ''}
+              onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.text}
             >
               Catálogo
             </Link>
@@ -98,18 +100,20 @@ export default function NavBar() {
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-gray-700 transition-colors font-medium py-2"
+                className="transition-colors font-medium py-2"
+                style={{ color: theme.colors.text }}
                 onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
-                onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.text}
               >
                 Inicio
               </Link>
               <Link
                 to="/catalog"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-gray-700 transition-colors font-medium py-2"
+                className="transition-colors font-medium py-2"
+                style={{ color: theme.colors.text }}
                 onMouseEnter={(e) => e.currentTarget.style.color = theme.colors.primary}
-                onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                onMouseLeave={(e) => e.currentTarget.style.color = theme.colors.text}
               >
                 Catálogo
               </Link>
