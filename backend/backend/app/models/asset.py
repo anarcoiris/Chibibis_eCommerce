@@ -28,9 +28,9 @@ class Asset(SQLModel, table=True):
         unique=True,
         description="Relative path from static root (e.g., 'uploads/2025/10/abc123.jpg')"
     )
-    file_type: Literal["image", "document", "video", "other"] = Field(
+    file_type: str = Field(
         default="image",
-        description="General category of file"
+        description="General category of file (image, document, video, other)"
     )
     mime_type: str = Field(
         max_length=100,

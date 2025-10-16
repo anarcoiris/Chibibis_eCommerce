@@ -93,8 +93,8 @@ class PageSection(SQLModel, table=True):
         index=True,
         description="Page identifier (e.g., 'home', 'about', 'catalog')"
     )
-    section_type: Literal["hero", "content_block", "product_grid"] = Field(
-        description="Type of section determines content schema"
+    section_type: str = Field(
+        description="Type of section determines content schema (hero, content_block, product_grid)"
     )
     order: int = Field(
         default=0,
