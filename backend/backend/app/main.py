@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.api.v1 import products, posts, design
+from backend.app.api.v1 import products, posts, design, sections, assets, menu_items
 from backend.app.db import create_db_and_tables
-from backend.app.models import User, Product, Post, SiteDesign  # Import models to register them
+from backend.app.models import (
+    User, Product, Post, SiteDesign,
+    PageSection, Asset, MenuItem  # Import CMS models to register with SQLModel
+)
 
 app = FastAPI(title="MiEcommerce API - Admin Panel")
 
@@ -31,6 +34,9 @@ def on_startup():
 app.include_router(products.router, prefix="/api/v1/products", tags=["products"])
 app.include_router(posts.router, prefix="/api/v1/posts", tags=["posts"])
 app.include_router(design.router, prefix="/api/v1/design", tags=["design"])
+app.include_router(sections.router, prefix="/api/v1/sections", tags=["sections"])
+app.include_router(assets.router, prefix="/api/v1/assets", tags=["assets"])
+app.include_router(menu_items.router, prefix="/api/v1/menu-items", tags=["menu-items"])
 
 # serve static assets (placeholders)
 app.mount("/static", StaticFiles(directory="backend/static"), name="static")
