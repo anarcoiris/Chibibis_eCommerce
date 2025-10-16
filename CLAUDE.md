@@ -235,3 +235,4 @@ Next planned features:
 9. Background jobs for emails and reports (Redis + Celery)
 10. Cloud deployment (Railway, Render, Fly.io, Vercel for frontend)
 - to memorize
+- to memorize
