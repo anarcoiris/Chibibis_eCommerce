@@ -4,8 +4,12 @@ from typing import List
 from backend.app.db import get_session
 from backend.app.models import Post
 from backend.app.schemas.post import PostResponse, PostCreate, PostUpdate
+from fastapi.responses import HTMLResponse
+import bleach
+import logging
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/", response_model=List[PostResponse])
@@ -93,3 +97,76 @@ def delete_post(post_id: int, session: Session = Depends(get_session)):
     session.delete(db_post)
     session.commit()
     return None
+
+
+# --- sanitización segura para contenido HTML de posts (mejorada) ---
+ALLOWED_TAGS = set(bleach.sanitizer.ALLOWED_TAGS) | {
+    "img", "figure", "figcaption", "details", "summary",
+    "table", "thead", "tbody", "tr", "th", "td", "caption",
+    "pre", "code", "meter", "progress", "blockquote", "caption"
+}
+
+ALLOWED_ATTRIBUTES = {
+    **bleach.sanitizer.ALLOWED_ATTRIBUTES,
+    "img": ["src", "alt", "width", "height", "loading"],
+    "a": ["href", "title", "target", "rel"],
+    "*": ["class", "id"]
+}
+
+# Protocols: esquemas válidos. No incluir "/" (no es necesario para rutas relativas).
+ALLOWED_PROTOCOLS = ["http", "https", "mailto", "tel"]
+
+
+def sanitize_post_html(html: str) -> str:
+    """
+    Limpia y normaliza HTML de posts para reducir riesgo XSS.
+    strip=True elimina etiquetas no permitidas.
+    En caso de error devuelve una cadena vacía segura.
+    """
+    try:
+        cleaned = bleach.clean(
+            html or "",
+            tags=list(ALLOWED_TAGS),
+            attributes=ALLOWED_ATTRIBUTES,
+            protocols=ALLOWED_PROTOCOLS,
+            strip=True
+        )
+        return cleaned
+    except Exception:
+        logger.exception("Error sanitizando HTML del post; devolviendo contenido vacío.")
+        return ""
+
+
+# Cabecera CSP por defecto (ajústala según tus necesidades)
+DEFAULT_CSP = (
+    "default-src 'self'; "
+    "img-src 'self' data: https:; "
+    "style-src 'self' 'unsafe-inline'; "
+    "font-src 'self' https:; "
+    "script-src 'none'; "
+    "frame-ancestors 'none';"
+)
+
+
+@router.get("/{post_id}/render", response_class=HTMLResponse)
+def render_post(post_id: int, session: Session = Depends(get_session)):
+    """
+    Devuelve el campo `content` del post COMO HTML (Content-Type: text/html).
+    La salida se sanitiza para mitigar XSS y se devuelve con una CSP básica.
+    """
+    post = session.get(Post, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    safe_html = sanitize_post_html(post.content)
+
+    # Auditoría ligera: detectar sanitizaciones agresivas
+    if post.content and len(safe_html) < (len(post.content) // 2):
+        logger.info("Sanitización intensa: contenido reducido para post_id=%s", post_id)
+
+    headers = {
+        "Content-Security-Policy": DEFAULT_CSP,
+        "X-Frame-Options": "DENY",
+    }
+
+    return HTMLResponse(content=safe_html, status_code=200, headers=headers)
