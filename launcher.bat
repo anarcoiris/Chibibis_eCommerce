@@ -1,7 +1,9 @@
 @echo off
-REM ============================================
-REM ECOMMERCE PROJECT - INTERACTIVE LAUNCHER
-REM ============================================
+REM ==================================================
+REM ECOMMERCE PROJECT - INTERACTIVE LAUNCHER (v2)
+REM ==================================================
+REM color 0C -> texto rojo-naranja intenso, fondo negro
+color 0C
 
 :MENU
 cls
@@ -10,6 +12,7 @@ echo ========================================
 echo  ECOMMERCE PROJECT - LAUNCHER
 echo ========================================
 echo.
+echo  0. Install prerequisites (NodeJS, Python 3.10.11, ...)
 echo  1. Install / Setup (First Time)
 echo  2. Start All Servers
 echo  3. Start Backend Only
@@ -21,8 +24,9 @@ echo.
 echo ========================================
 echo.
 
-set /p choice="Select an option (1-7): "
+set /p choice="Select an option (0-7): "
 
+if "%choice%"=="0" goto PREREQS
 if "%choice%"=="1" goto SETUP
 if "%choice%"=="2" goto START_ALL
 if "%choice%"=="3" goto START_BACKEND
@@ -33,6 +37,67 @@ if "%choice%"=="7" goto EXIT
 
 echo Invalid option. Please try again.
 timeout /t 2 >nul
+goto MENU
+
+:PREREQS
+cls
+echo.
+echo ========================================
+echo  INSTALLING PREREQUISITES (via winget)
+echo ========================================
+echo.
+
+where winget >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] winget no encontrado.
+    echo Instala manualmente las dependencias necesarias:
+    echo.
+    echo    winget install --id=OpenJS.NodeJS -e --accept-package-agreements --accept-source-agreements
+    echo    winget install --id=Python.Python.3.10 -e --accept-package-agreements --accept-source-agreements
+    echo.
+    pause
+    goto MENU
+)
+
+echo winget detectado correctamente.
+echo.
+echo Se instalarán los siguientes paquetes:
+echo    - NodeJS (OpenJS.NodeJS)
+echo    - Python 3.10 (Python.Python.3.10)
+echo.
+choice /C YN /M "¿Deseas continuar con la instalación?"
+if errorlevel 2 goto MENU
+
+echo.
+echo ===================================================
+echo 🔧 Instalando NodeJS...
+echo ===================================================
+echo.
+winget install --id=OpenJS.NodeJS -e --accept-package-agreements --accept-source-agreements
+if errorlevel 1 (
+    echo [ERROR] Falló la instalación de NodeJS.
+    pause
+    goto MENU
+)
+
+echo.
+echo ===================================================
+echo 🐍 Instalando Python 3.10...
+echo ===================================================
+echo.
+winget install --id=Python.Python.3.10 -e --accept-package-agreements --accept-source-agreements
+if errorlevel 1 (
+    echo [ERROR] Falló la instalación de Python.
+    pause
+    goto MENU
+)
+
+echo.
+echo ===================================================
+echo ✅ Todos los prerequisitos fueron instalados correctamente.
+echo ===================================================
+echo.
+pause
 goto MENU
 
 :SETUP
